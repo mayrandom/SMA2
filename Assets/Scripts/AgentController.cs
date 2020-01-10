@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Text;
+using System;
 
 
 public class AgentController : MonoBehaviour
@@ -11,20 +12,49 @@ public class AgentController : MonoBehaviour
     private NavMeshHit hit;
     private float range = 10.0f;
     private Vector3 point;
+    public List<string> indices = new List<string>();
+    public float confidence;
+    public bool coupableTrouve = false;
+    public int exchangeNumber;
+    public int objectNumber;
+    public static System.Random random = new System.Random();
     public List<GameObject> inventory = new List<GameObject>();
     StringBuilder allGameObjects = new StringBuilder();
-   
+    private List<float> temps_indice = new List<float>();
+
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();   
+        agent = GetComponent<NavMeshAgent>();
+      //  confidence = NextGaussian(80, 40, 15, 90);
     }
 
-    //Choose th point where moving agents randomly
+   /* public float NextGaussian(float mean, float standard_deviation, float min, float max)
+    {
+        float v1, v2, s;
+        do
+        {
+            v1 = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
+            v2 = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
+            s = v1 * v1 + v2 * v2;
+        } while (s >= 1.0f || s == 0f);
+
+        s = Mathf.Sqrt((-2.0f * Mathf.Log(s)) / s);
+
+        float gauss = v1 * s;
+
+        do
+        {
+            gauss = mean + gauss * standard_deviation;
+        } while (gauss < min || gauss > max);
+
+        return gauss;
+    }*/
+
     bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 30; i++)
         {
-            Vector3 randomPoint = center + Random.insideUnitSphere * range;
+            Vector3 randomPoint = center + UnityEngine.Random.insideUnitSphere * range;
             NavMeshHit hit;
             if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
             {
@@ -36,11 +66,11 @@ public class AgentController : MonoBehaviour
         return false;
     }
 
-    // Move agents
     void FreeWalk()
     {
         if (RandomPoint(transform.position, range, out point))
         {
+            Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f);
             agent.SetDestination(point);
             agent.transform.LookAt(point);
         }
@@ -56,18 +86,24 @@ public class AgentController : MonoBehaviour
                 {
                     FreeWalk();
                     SeeIndice();
+                    SeeAgent();
+                    if (temps_indice.Count > 0)
+                    {
+                        VerifTime();
+                    }
                 }
         }
     }
 
-    public float seeRange = 1.0f;             //range to detect items
-    public int layer = 2;                     //example scene indice layer
-    public string IndiceTag = "indice";  //clue tag
+    public float seeRange = 4.0f;             //range to detect items
+
+    public string IndiceTag = "indice";  //edible tag
+    public string AgentTag = "agent";  //edible tag
+
 
     void SeeIndice()
     {
-       
-        Collider[] indiceinrange = SeeIndice(transform.position, seeRange, layer);
+        Collider[] indiceinrange = See(transform.position, seeRange);
         if (indiceinrange.Length > 0)
         {
             for (int i = 0; i < indiceinrange.Length; i++)
@@ -75,25 +111,71 @@ public class AgentController : MonoBehaviour
                 if (IndiceTag == indiceinrange[i].tag)
                 {
                     Debug.Log("Detected :" + indiceinrange[i].name);
-
-                    if (!inventory.Contains(indiceinrange[i].gameObject))
+                    if (agent.gameObject.GetComponent<AgentCaracteristics>().indices.IndexOf(indiceinrange[i].name) == -1)
                     {
-                       inventory.Add(indiceinrange[i].gameObject);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(indiceinrange[i].name);
+                        
+                        // temps au moment trouvaille
+                        temps_indice.Add(Time.deltaTime);
+                        inventory.Add(indiceinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
 
+                        //pour l'inventaire
                         allGameObjects.Append(indiceinrange[i].name + "\n");
                     }
                 }
             }
-        }     
+        }
     }
 
     //get a list of colliders in range on this layer
-    Collider[] SeeIndice(Vector3 agentPosition, float range, int layer)
+    Collider[] See(Vector3 agentPosition, float range)
     {
-       
         Collider[] hitColliders = Physics.OverlapSphere(agentPosition, range);
         return hitColliders;
     }
+
+    void SeeAgent()
+    {
+        Collider[] agentinrange = See(transform.position, seeRange); //même collider que ci-dessus
+
+        if (agentinrange.Length > 0)
+        {
+            for (int i = 0; i < agentinrange.Length; i++)
+            {
+                if (AgentTag == agentinrange[i].tag)
+                {
+                    Debug.Log("Detected : " + agentinrange[i].name);
+
+                    if (agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices != null)
+                    {
+                        List<string> agentMetIndices = agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
+                        Debug.Log("Liste :" + agentMetIndices[0]);
+
+                        //récupérer trust de l'agent
+                        int trust = 101;
+
+                        //random => if random < trust, l'agent reçoit l'un des objets de l'autre
+                        exchangeNumber = random.Next(0, 101);
+                        if (exchangeNumber < trust)
+                        {
+                            //récupérer l'inventaire de l'autre agent, sélectionner un objet au hasard
+                            objectNumber = random.Next(0, agentMetIndices.Count);
+                            string objet = agentMetIndices[objectNumber];
+
+                            // vérification de l'inventaire, si objet déjà présent -> on ne l'ajoute pas
+                            if (agent.gameObject.GetComponent<AgentCaracteristics>().indices.IndexOf(objet) == -1)
+                            {
+                                agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objet);
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+   
 
     /// <summary>
     /// INVENTAIRE
@@ -101,7 +183,7 @@ public class AgentController : MonoBehaviour
 
     //Private Variables
     private bool InventoryOn = false;
-     
+
     void OnMouseUp()
     {
         //lorsqu on clic gauche sur l'objet contenant ce script,l'inventaire s'affiche et se ferme
@@ -111,7 +193,7 @@ public class AgentController : MonoBehaviour
             {
                 InventoryOn = true;
             }
-           else if (InventoryOn == true)
+            else if (InventoryOn == true)
             {
                 InventoryOn = false;
             }
@@ -120,10 +202,11 @@ public class AgentController : MonoBehaviour
     void OnGUI()
     {
         if (InventoryOn == true)
-        {           
-            GUI.BeginGroup(new Rect(0,0, 2000,2000));
-            
-            Rect sizeBox = new Rect(950,10,150, 500);
+        {
+
+            GUI.BeginGroup(new Rect(0, 0, 2000, 2000));
+
+            Rect sizeBox = new Rect(950, 10, 150, 500);
             GUI.Box(sizeBox, "\n \n Indices récupérés : \n \n" + allGameObjects);
 
             if (GUI.Button(new Rect(950, 10, 30, 30), "X"))
@@ -133,6 +216,94 @@ public class AgentController : MonoBehaviour
 
             GUI.EndGroup();
         }
+    }
+
+    /// <summary>
+    /// COUPABLE DESIGNE
+    /// </summary>
+
+    public bool Coupable()
+    {
+        string[] indices = { "couteau", "champignons", "compas", "briquet", "carnet", "lampe" };
+        int[] points = { 6, 5, 4, 3, 2, 1 };
+        int total = 0;
+
+
+        for (int i = 0; i < inventory.Count; i++)
+        {
+            for (int j = 0; j < indices.Length; j++)
+            {
+                if (inventory[i].name == indices[j])
+                {
+                    total = total + points[j];
+                }
+
+            }
+        }
+
+        if (total >= 10)
+            return true;
+        else return false;
+    }
+
+
+    /// <summary>
+    /// MEMOIRE
+    /// </summary>
+    /// 
+
+
+    private float timer = 0.0f;
+    private List<string> anciens_indices=new List<string>();
+
+    void VerifTime() // il faudrait le faire pour deux niveaux différents (là on suppose que c'est pour la bonne mémoire)
+    {
+        timer += Time.deltaTime;
+        int k = 0;
+        
+        
+        for (int i = 0; i < temps_indice.Count; i++)
+        {
+
+            for (int j = 0; j < anciens_indices.Count; j++)
+            {
+                Debug.Log("verification temps");
+                if (inventory[i].name == anciens_indices[j])
+                {
+                    k++; //compte le nombre de rappels  
+                }
+
+                if (k == 0) //il a eu l'indice qu'une seule fois
+                {
+                    if (timer - temps_indice[i] > 100.0f) // bon là j'ai mit un temps au hasard, à redéfinir
+                    {
+                       inventory.Remove(inventory[i]);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i].name);
+                        temps_indice.Remove(temps_indice[i]);
+                        anciens_indices.Add(inventory[i].name);
+
+                    }
+                }
+                else
+                {
+                    if (timer - temps_indice[i] > 200.0f) // s'en souvient plus longtemps s'il y a eu un rappel
+                    {
+                        inventory.Remove(inventory[i]);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i].name);
+                        temps_indice.Remove(temps_indice[i]);
+                        anciens_indices.Add(inventory[i].name);
+
+                    }
+                }
+
+                k = 0;
+            }
+
+
+
+        }
+
+
     }
 
 }
