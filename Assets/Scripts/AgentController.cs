@@ -12,11 +12,14 @@ public class AgentController : MonoBehaviour
     private float range = 10.0f;
     private Vector3 point;
     public List<GameObject> inventory = new List<GameObject>();
-    StringBuilder allGameObjects = new StringBuilder();
+    private StringBuilder allGameObjects = new StringBuilder();
+    private Camera agentCamera;
+
    
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();   
+        agent = GetComponent<NavMeshAgent>();
+        agentCamera = gameObject.GetComponent<Camera>();
     }
 
     //Choose th point where moving agents randomly
@@ -104,6 +107,7 @@ public class AgentController : MonoBehaviour
      
     void OnMouseUp()
     {
+        agentCamera.enabled = true;
         //lorsqu on clic gauche sur l'objet contenant ce script,l'inventaire s'affiche et se ferme
         if (Input.GetMouseButtonUp(0))
         {
