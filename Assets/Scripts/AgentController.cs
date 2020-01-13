@@ -13,7 +13,7 @@ public class AgentController : MonoBehaviour
     private float range = 10.0f;
     private Vector3 point;
     public List<string> indices = new List<string>();
-    public float confidence;
+    public double confidence;
     public bool coupableTrouve = false;
     public int exchangeNumber;
     public int objectNumber;
@@ -25,32 +25,25 @@ public class AgentController : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-      //  confidence = NextGaussian(80, 40, 15, 90);
+        confidence = gaussienne(80, 40);
     }
 
-   /* public float NextGaussian(float mean, float standard_deviation, float min, float max)
-    {
-        float v1, v2, s;
-        do
-        {
-            v1 = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
-            v2 = 2.0f * UnityEngine.Random.Range(0f, 1f) - 1.0f;
-            s = v1 * v1 + v2 * v2;
-        } while (s >= 1.0f || s == 0f);
+    System.Random rand = new System.Random(1);
 
-        s = Mathf.Sqrt((-2.0f * Mathf.Log(s)) / s);
+    public double gaussienne(float mean, float standardDeviation) {
+       
+        double u1 = 1.0 - rand.NextDouble(); //uniform(0,1] random doubles
+        double u2 = 1.0 - rand.NextDouble();
+        double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
+                     Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
+        double x =
+                     mean + standardDeviation * randStdNormal;
 
-        float gauss = v1 * s;
+        return x;
+}
 
-        do
-        {
-            gauss = mean + gauss * standard_deviation;
-        } while (gauss < min || gauss > max);
 
-        return gauss;
-    }*/
-
-    bool RandomPoint(Vector3 center, float range, out Vector3 result)
+bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 30; i++)
         {
