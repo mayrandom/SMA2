@@ -8,7 +8,7 @@ public class AgentCaracteristics : MonoBehaviour
     private bool memory;
     public bool courage;
     public bool trust;
-    public List<string> indices = new List<string>();
+    public List<GameObject> indices = new List<GameObject>();
     public string[] noms;
     public int id = 0;
 
@@ -19,7 +19,6 @@ public class AgentCaracteristics : MonoBehaviour
         courage = Courage;
         trust = Trust;
         id = Id;
-        indices.Add("test");
     }
 
 }

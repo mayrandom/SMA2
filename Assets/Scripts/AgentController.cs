@@ -12,20 +12,23 @@ public class AgentController : MonoBehaviour
     private NavMeshHit hit;
     private float range = 10.0f;
     private Vector3 point;
-    public List<string> indices = new List<string>();
+    //public List<string> indices = new List<string>();
     public double confidence;
     public bool coupableTrouve = false;
     public int exchangeNumber;
-    public int objectNumber;
+    public int clueNumber;
+    public GameObject clue;
     public static System.Random random = new System.Random();
     public List<GameObject> inventory = new List<GameObject>();
     StringBuilder allGameObjects = new StringBuilder();
     private List<float> temps_indice = new List<float>();
+    public GameObject lampe;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         confidence = gaussienne(80, 40);
+        lampe.name = "lampe";
     }
 
     System.Random rand = new System.Random(1);
@@ -40,10 +43,10 @@ public class AgentController : MonoBehaviour
                      mean + standardDeviation * randStdNormal;
 
         return x;
-}
+    }
 
 
-bool RandomPoint(Vector3 center, float range, out Vector3 result)
+    bool RandomPoint(Vector3 center, float range, out Vector3 result)
     {
         for (int i = 0; i < 30; i++)
         {
@@ -78,8 +81,10 @@ bool RandomPoint(Vector3 center, float range, out Vector3 result)
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     FreeWalk();
-                    SeeIndice();
-                    SeeAgent();
+                    Collider[] objectinrange = See(transform.position, seeRange);
+                    SeeIndice(objectinrange);
+                    SeeAgent(objectinrange);
+                    SeeVillager(objectinrange);
                     if (temps_indice.Count > 0)
                     {
                         VerifTime();
@@ -92,28 +97,30 @@ bool RandomPoint(Vector3 center, float range, out Vector3 result)
 
     public string IndiceTag = "indice";  //edible tag
     public string AgentTag = "agent";  //edible tag
+    public string VillagerTagFL = "villagerFL";  //edible tag
+    public string VillagerTagF = "villagerF";  //edible tag
+    public string VillagerTagL = "villagerL";  //edible tag
 
 
-    void SeeIndice()
+    void SeeIndice(Collider[] objectinrange)
     {
-        Collider[] indiceinrange = See(transform.position, seeRange);
-        if (indiceinrange.Length > 0)
+        if (objectinrange.Length > 0)
         {
-            for (int i = 0; i < indiceinrange.Length; i++)
+            for (int i = 0; i < objectinrange.Length; i++)
             {
-                if (IndiceTag == indiceinrange[i].tag)
+                if (IndiceTag == objectinrange[i].tag)
                 {
-                    Debug.Log("Detected :" + indiceinrange[i].name);
-                    if (agent.gameObject.GetComponent<AgentCaracteristics>().indices.IndexOf(indiceinrange[i].name) == -1)
+                    Debug.Log("Detected :" + objectinrange[i].name);
+                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objectinrange[i].gameObject))
                     {
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(indiceinrange[i].name);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objectinrange[i].gameObject);
                         
                         // temps au moment trouvaille
                         temps_indice.Add(Time.deltaTime);
-                        inventory.Add(indiceinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
+                        inventory.Add(objectinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
 
                         //pour l'inventaire
-                        allGameObjects.Append(indiceinrange[i].name + "\n");
+                        allGameObjects.Append(objectinrange[i].name + "\n");
                     }
                 }
             }
@@ -127,42 +134,80 @@ bool RandomPoint(Vector3 center, float range, out Vector3 result)
         return hitColliders;
     }
 
-    void SeeAgent()
+    void SeeAgent(Collider[] objectinrange)
     {
-        Collider[] agentinrange = See(transform.position, seeRange); //même collider que ci-dessus
-
-        if (agentinrange.Length > 0)
+        if (objectinrange.Length > 0)
         {
-            for (int i = 0; i < agentinrange.Length; i++)
+            for (int i = 0; i < objectinrange.Length; i++)
             {
-                if (AgentTag == agentinrange[i].tag)
+                if (AgentTag == objectinrange[i].tag) //on vérifie que l'objet détecté est bien un agent
                 {
-                    Debug.Log("Detected : " + agentinrange[i].name);
+                    Debug.Log("Detected : " + objectinrange[i].name);
 
-                    if (agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices != null)
+                    if ((objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices != null) && (objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices.Count != 0)) //A VERIFIER
                     {
-                        List<string> agentMetIndices = agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
-                        Debug.Log("Liste :" + agentMetIndices[0]);
+                        List<GameObject> agentMetIndices = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
 
                         //récupérer trust de l'agent
-                        int trust = 101;
+                        int trust = 101; //A REMPLACER
 
                         //random => if random < trust, l'agent reçoit l'un des objets de l'autre
                         exchangeNumber = random.Next(0, 101);
                         if (exchangeNumber < trust)
                         {
                             //récupérer l'inventaire de l'autre agent, sélectionner un objet au hasard
-                            objectNumber = random.Next(0, agentMetIndices.Count);
-                            string objet = agentMetIndices[objectNumber];
+                            clueNumber = random.Next(0, agentMetIndices.Count);
+                            GameObject objet = agentMetIndices[clueNumber];
 
                             // vérification de l'inventaire, si objet déjà présent -> on ne l'ajoute pas
-                            if (agent.gameObject.GetComponent<AgentCaracteristics>().indices.IndexOf(objet) == -1)
+                            if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objet))
                             {
                                 agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objet);
+                                // temps au moment trouvaille
+                                temps_indice.Add(Time.deltaTime);
+                                inventory.Add(objectinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
+
+                                //pour l'inventaire
+                                allGameObjects.Append(objectinrange[i].name + "\n");
                             }
                         }
                     }
 
+                }
+            }
+        }
+    }
+
+    void SeeVillager(Collider[] objectinrange)
+    {
+        if (objectinrange.Length > 0)
+        {
+            for (int i = 0; i < objectinrange.Length; i++)
+            {
+                if (VillagerTagFL == objectinrange[i].tag)
+                {
+                    Debug.Log("Detected :" + objectinrange[i].name);
+                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(lampe))
+                    {
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(lampe);
+                    }
+                }
+                if (VillagerTagF == objectinrange[i].tag)
+                {
+                    Debug.Log("Detected :" + objectinrange[i].name);
+                    //si courage, agent va dans la forêt
+                }
+                if (VillagerTagL == objectinrange[i].tag)
+                {
+                    Debug.Log("Detected :" + objectinrange[i].name);
+                    int trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; //A CHANGER
+
+                    //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
+                    exchangeNumber = random.Next(0, 101);
+                    if (exchangeNumber < trust && trust > 85)
+                    {
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Clear();
+                    }
                 }
             }
         }
