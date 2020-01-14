@@ -5,15 +5,15 @@ using UnityEngine.AI;
 
 public class AgentCaracteristics : MonoBehaviour
 {
-    private bool memory;
+    public bool memory;
     public bool courage;
-    public bool trust;
+    public double trust;
     public List<GameObject> indices = new List<GameObject>();
     public string[] noms;
     public int id = 0;
 
     // Initialize agent
-    public void ReceiveAgentParameters(bool Memory, bool Courage, bool Trust, int Id)
+    public void ReceiveAgentParameters(bool Memory, bool Courage, double Trust, int Id)
     {
         memory = Memory;
         courage = Courage;

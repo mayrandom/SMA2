@@ -11,7 +11,7 @@ public class InitializeMainScene : MonoBehaviour
     private string[] noms;
 
     bool memory;
-    bool trust;
+    double trust;
     bool courage;
 
     // Start is called before the first frame update
@@ -47,11 +47,11 @@ public class InitializeMainScene : MonoBehaviour
 
             if (nbTrust != 0)
             {
-                trust = true;
+                trust = 80;
                 nbTrust--;
             }
             else
-                trust = false;
+                trust = 20;
 
             if (nbCourage != 0)
             {

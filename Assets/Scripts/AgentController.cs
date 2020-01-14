@@ -200,7 +200,7 @@ public class AgentController : MonoBehaviour
                 if (VillagerTagL == objectinrange[i].tag)
                 {
                     Debug.Log("Detected :" + objectinrange[i].name);
-                    int trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; //A CHANGER
+                    double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; //A CHANGER
 
                     //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
                     exchangeNumber = random.Next(0, 101);
@@ -244,10 +244,17 @@ public class AgentController : MonoBehaviour
 
             GUI.BeginGroup(new Rect(0, 0, 2000, 2000));
 
-            Rect sizeBox = new Rect(950, 10, 150, 500);
-            GUI.Box(sizeBox, "\n \n Indices récupérés : \n \n" + allGameObjects);
+            Rect sizeBox = new Rect(930, 10, 200, 500);
+            string memoire = "mauvaise";
+            string courage = "non";
+            double confiance = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().memory)
+            { memoire = "bonne"; }
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().courage)
+            { courage = "oui"; }
+            GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Nom : " + agent.gameObject.GetComponent<AgentCaracteristics>().noms + "\n Confiance aux autres : " + confiance + "% \n Mémoire : " + memoire + "\n Courageux : " + courage + "\n \n INDICES : \n \n" + allGameObjects  );
 
-            if (GUI.Button(new Rect(950, 10, 30, 30), "X"))
+            if (GUI.Button(new Rect(930, 10, 30, 30), "X"))
             {
                 InventoryOn = false;
             }
@@ -316,7 +323,7 @@ public class AgentController : MonoBehaviour
                     if (timer - temps_indice[i] > 100.0f) // bon là j'ai mit un temps au hasard, à redéfinir
                     {
                        inventory.Remove(inventory[i]);
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i].name);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i]);
                         temps_indice.Remove(temps_indice[i]);
                         anciens_indices.Add(inventory[i].name);
 
@@ -327,7 +334,7 @@ public class AgentController : MonoBehaviour
                     if (timer - temps_indice[i] > 200.0f) // s'en souvient plus longtemps s'il y a eu un rappel
                     {
                         inventory.Remove(inventory[i]);
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i].name);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i]);
                         temps_indice.Remove(temps_indice[i]);
                         anciens_indices.Add(inventory[i].name);
 
