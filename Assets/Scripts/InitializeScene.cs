@@ -23,6 +23,10 @@ public class InitializeScene : MonoBehaviour
         nbMemory = SliderMemory.GetComponent<Slider>().value;
         trust = InputTrust.GetComponent<InputField>().text;
         nbTrust = float.Parse(trust);
+        if (nbTrust > 100)
+            nbTrust = 100;
+        if (nbTrust < 0)
+            nbTrust = 0;
         nbCourage = SliderCourage.GetComponent<Slider>().value;
 
         SceneManager.LoadScene("MainScene");

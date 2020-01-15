@@ -1076,7 +1076,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SliderMemory: {fileID: 520000926}
-  SliderTrust: {fileID: 0}
+  InputTrust: {fileID: 648032394}
   SliderCourage: {fileID: 756730055}
 --- !u!1 &644914559
 GameObject:
