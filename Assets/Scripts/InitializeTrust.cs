@@ -5,7 +5,7 @@ using UnityEngine;
 public class InitializeTrust : MonoBehaviour
 {
 
-    public static double[] gaussienne(double mean, double standardDeviation)
+    public double[] gaussienne(double mean, double standardDeviation)
     {
         System.Random rand = new System.Random(1);
         double[] tab = new double[5];

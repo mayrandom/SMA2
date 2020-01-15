@@ -13,9 +13,10 @@ public class AgentCaracteristics : MonoBehaviour
     public float[] culpritConfidence;
 
     // Initialize agent
-    public void ReceiveAgentParameters(bool Memory, bool Courage, bool Trust, int Id)
+    public void ReceiveAgentParameters(bool Memory, bool Courage, float Trust, int Id)
     {
         id = Id;
+        trust = Trust;
 
         if (Memory)
             memory = 0.8f;
@@ -27,10 +28,7 @@ public class AgentCaracteristics : MonoBehaviour
         else
             courage = 0.2f;
 
-        if (Trust)
-            trust = 0.8f;
-        else
-            trust = 0.2f;
+
     }
 
     void Update()
