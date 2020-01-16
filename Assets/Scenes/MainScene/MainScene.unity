@@ -7769,6 +7769,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: villageois
       objectReference: {fileID: 0}
+    - target: {fileID: 1968476592218994, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
+      propertyPath: m_TagString
+      value: villagerL
+      objectReference: {fileID: 0}
     - target: {fileID: 4889916270699016, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -25.82
@@ -18258,6 +18262,7 @@ GameObject:
   - component: {fileID: 1032548974}
   - component: {fileID: 1032548973}
   - component: {fileID: 1032548972}
+  - component: {fileID: 1032548975}
   m_Layer: 0
   m_Name: ForestTrigger
   m_TagString: Untagged
@@ -18300,6 +18305,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1032548975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1032548971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f18a4f437b68214abcfb2c7955d1e7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1054155123
 PrefabInstance:
   m_ObjectHideFlags: 0
