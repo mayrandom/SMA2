@@ -150,10 +150,10 @@ public class AgentController : MonoBehaviour
                         List<GameObject> agentMetIndices = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
 
                         //récupérer trust de l'agent
-                        double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
+                        float trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
                         //random => if random < trust, l'agent reçoit l'un des objets de l'autre
-                        exchangeNumber = random.Next(0, 101);
+                        float exchangeNumber = UnityEngine.Random.Range(0.0f, 1.0f);
                         if (exchangeNumber < trust)
                         {
                             //récupérer l'inventaire de l'autre agent, sélectionner un objet au hasard
@@ -198,17 +198,20 @@ public class AgentController : MonoBehaviour
                 if (VillagerTagF == objectinrange[i].tag)
                 {
                     Debug.Log("Detected :" + objectinrange[i].name);
-                    agent.SetDestination(forest); //si courage, agent va dans la forêt
-                    agent.transform.LookAt(forest);
+                    if (agent.gameObject.GetComponent<AgentCaracteristics>().courage == 0.8f)
+                    {
+                        agent.SetDestination(forest); //si courage, agent va dans la forêt
+                        agent.transform.LookAt(forest);
+                    }
                 }
                 if (VillagerTagL == objectinrange[i].tag)
                 {
                     Debug.Log("Detected :" + objectinrange[i].name);
-                    double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; 
+                    float trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
                     //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
-                    exchangeNumber = random.Next(0, 101);
-                    if (exchangeNumber < trust && trust > 85)
+                    float exchangeNumber = UnityEngine.Random.Range(0.0f, 1.0f);
+                    if (exchangeNumber < trust && trust == 0.8f)
                     {
                         agent.gameObject.GetComponent<AgentCaracteristics>().indices.Clear();
                     }
