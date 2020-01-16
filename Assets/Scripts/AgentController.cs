@@ -12,7 +12,6 @@ public class AgentController : MonoBehaviour
     private NavMeshHit hit;
     private float range = 10.0f;
     private Vector3 point;
-    //public List<string> indices = new List<string>();
     public double confidence;
     public bool coupableTrouve = false;
     public int exchangeNumber;
@@ -23,6 +22,7 @@ public class AgentController : MonoBehaviour
     StringBuilder allGameObjects = new StringBuilder();
     private List<float> temps_indice = new List<float>();
     public GameObject lampe;
+    public Vector3 forest = new Vector3(-51f, 3f, 15f);
 
     void Start()
     {
@@ -94,7 +94,6 @@ public class AgentController : MonoBehaviour
     }
 
     public float seeRange = 4.0f;             //range to detect items
-
     public string IndiceTag = "indice";  //edible tag
     public string AgentTag = "agent";  //edible tag
     public string VillagerTagFL = "villagerFL";  //edible tag
@@ -149,7 +148,7 @@ public class AgentController : MonoBehaviour
                         List<GameObject> agentMetIndices = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
 
                         //récupérer trust de l'agent
-                        int trust = 101; //A REMPLACER
+                        double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
                         //random => if random < trust, l'agent reçoit l'un des objets de l'autre
                         exchangeNumber = random.Next(0, 101);
@@ -195,12 +194,13 @@ public class AgentController : MonoBehaviour
                 if (VillagerTagF == objectinrange[i].tag)
                 {
                     Debug.Log("Detected :" + objectinrange[i].name);
-                    //si courage, agent va dans la forêt
+                    agent.SetDestination(forest); //si courage, agent va dans la forêt
+                    agent.transform.LookAt(forest);
                 }
                 if (VillagerTagL == objectinrange[i].tag)
                 {
                     Debug.Log("Detected :" + objectinrange[i].name);
-                    double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; //A CHANGER
+                    double trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust; 
 
                     //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
                     exchangeNumber = random.Next(0, 101);
