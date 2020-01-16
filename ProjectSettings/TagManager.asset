@@ -5,8 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - indice
-  - VillagerTagF
-  - VillagerTagL
+  - villagerF
+  - villagerL
+  - villagerFL
+  - agent
   layers:
   - Default
   - TransparentFX

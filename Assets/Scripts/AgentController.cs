@@ -224,6 +224,11 @@ public class AgentController : MonoBehaviour
 
     void OnMouseUp()
     {
+        //Enable agent camera and button for returning to main view
+        agentCamera.enabled = true;
+        returnButton.SetActive(true);
+        returnButton.GetComponent<ReturnMainCamOnClick>().ReceiveAgent(gameObject);
+
         //lorsqu on clic gauche sur l'objet contenant ce script,l'inventaire s'affiche et se ferme
         if (Input.GetMouseButtonUp(0))
         {

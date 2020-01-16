@@ -9,6 +9,7 @@ public class InitializeMainScene : MonoBehaviour
     public static float nbCourage;
 
     private string[] noms;
+    private double[] trustValues;
 
     bool memory;
     double trust;
@@ -31,6 +32,8 @@ public class InitializeMainScene : MonoBehaviour
 
         noms = new string[] { "Jean", "Dominique", "Michel", "Marie", "Pascal" };
         GameObject Agent = GameObject.Find("Agent");
+        trustValues = gameObject.GetComponent<InitializeTrust>().gaussienne(nbTrust, 5.0);
+
 
         for (int i = 1; i < 5; i++)
         {
@@ -45,14 +48,6 @@ public class InitializeMainScene : MonoBehaviour
             else
                 memory = false;
 
-            if (nbTrust != 0)
-            {
-                trust = 80;
-                nbTrust--;
-            }
-            else
-                trust = 20;
-
             if (nbCourage != 0)
             {
                 courage = true;
@@ -61,7 +56,7 @@ public class InitializeMainScene : MonoBehaviour
             else
                 courage = false;
 
-            Agent.GetComponent<AgentCaracteristics>().ReceiveAgentParameters(memory, courage, trust, i);
+            Agent.GetComponent<AgentCaracteristics>().ReceiveAgentParameters(memory, courage, (float) trustValues[i], i);
             Agent.transform.position = initialPos[i - 1];
         }
     }
