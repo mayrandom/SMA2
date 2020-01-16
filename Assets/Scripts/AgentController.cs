@@ -21,14 +21,16 @@ public class AgentController : MonoBehaviour
     public List<GameObject> inventory = new List<GameObject>();
     StringBuilder allGameObjects = new StringBuilder();
     private List<float> temps_indice = new List<float>();
-    public GameObject lampe;
     public Vector3 forest = new Vector3(-51f, 3f, 15f);
+    private Camera agentCamera;
+    [SerializeField]
+    public GameObject returnButton;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
+        agentCamera = gameObject.GetComponent<Camera>();
         confidence = gaussienne(80, 40);
-        lampe.name = "lampe";
     }
 
     System.Random rand = new System.Random(1);
@@ -185,6 +187,8 @@ public class AgentController : MonoBehaviour
             {
                 if (VillagerTagFL == objectinrange[i].tag)
                 {
+                    GameObject lampe = new GameObject();
+                    lampe.name = "lampe";
                     Debug.Log("Detected :" + objectinrange[i].name);
                     if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(lampe))
                     {
@@ -253,9 +257,9 @@ public class AgentController : MonoBehaviour
             string memoire = "mauvaise";
             string courage = "non";
             double confiance = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
-            if (agent.gameObject.GetComponent<AgentCaracteristics>().memory)
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().memory==0.8f)
             { memoire = "bonne"; }
-            if (agent.gameObject.GetComponent<AgentCaracteristics>().courage)
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().courage==0.8f)
             { courage = "oui"; }
             GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Nom : " + agent.gameObject.GetComponent<AgentCaracteristics>().noms + "\n Confiance aux autres : " + confiance + "% \n Mémoire : " + memoire + "\n Courageux : " + courage + "\n \n INDICES : \n \n" + allGameObjects  );
 

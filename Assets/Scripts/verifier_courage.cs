@@ -37,7 +37,7 @@ public class control_courage : MonoBehaviour
                     Debug.Log("courage :" + agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().courage);
 
 
-                    if (agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().courage == false)
+                    if (agentinrange[i].gameObject.GetComponent<AgentCaracteristics>().courage == 0.2f)
                     {
 
                         Debug.Log("OUST");
