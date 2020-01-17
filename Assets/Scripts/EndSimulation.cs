@@ -6,9 +6,6 @@ using UnityEngine;
 public class EndSimulation : MonoBehaviour
 {
     private GameObject[] agents;
-    public static float nbMemory;
-    public static float nbTrust;
-    public static float nbCourage;
     private int nbCulprit;
 
     [SerializeField]
@@ -31,8 +28,8 @@ public class EndSimulation : MonoBehaviour
         }
 
         nbAgentCulprit.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents ayant trouvé le coupable : " + nbCulprit;
-        nbAgentCourage.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents courageux : " + nbCourage;
-        nbAgentMemory.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents ayant bonne mémoire : " + nbMemory;
-        meanAgentTrust.GetComponent<TextMeshProUGUI>().text = "Moyenne de confiance des agents : " + nbTrust;
+        nbAgentCourage.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents courageux : " + InitializeScene.nbCourage;
+        nbAgentMemory.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents ayant bonne mémoire : " + InitializeScene.nbMemory;
+        meanAgentTrust.GetComponent<TextMeshProUGUI>().text = "Moyenne de confiance des agents : " + InitializeScene.nbTrust;
     }
 }
