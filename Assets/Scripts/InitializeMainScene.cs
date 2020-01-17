@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class InitializeMainScene : MonoBehaviour
 {
-    public static float nbMemory;
-    public static float nbTrust;
-    public static float nbCourage;
-
     private string[] noms;
     private double[] trustValues;
 
@@ -31,7 +27,7 @@ public class InitializeMainScene : MonoBehaviour
 
         noms = new string[] { "Jean", "Dominique", "Michel", "Marie", "Pascal" };
         GameObject Agent = GameObject.Find("Agent");
-        trustValues = gameObject.GetComponent<InitializeTrust>().gaussienne(nbTrust, 5.0);
+        trustValues = gameObject.GetComponent<InitializeTrust>().gaussienne(InitializeScene.nbTrust, 5.0);
 
 
         for (int i = 1; i < 5; i++)
@@ -39,18 +35,18 @@ public class InitializeMainScene : MonoBehaviour
             Instantiate(Agent);
 
             // Determine agent characteristics
-            if (nbMemory != 0)
+            if (InitializeScene.nbMemory != 0)
             {
                 memory = true;
-                nbMemory--;
+                InitializeScene.nbMemory--;
             }
             else
                 memory = false;
 
-            if (nbCourage != 0)
+            if (InitializeScene.nbCourage != 0)
             {
                 courage = true;
-                nbCourage--;
+                InitializeScene.nbCourage--;
             }
             else
                 courage = false;
