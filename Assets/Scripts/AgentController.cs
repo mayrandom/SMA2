@@ -12,7 +12,6 @@ public class AgentController : MonoBehaviour
     private NavMeshHit hit;
     private float range = 40.0f;
     private Vector3 point;
-    public double confidence;
     public bool coupableTrouve = false;
     public int exchangeNumber;
     public int clueNumber;
@@ -32,23 +31,10 @@ public class AgentController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         agentCamera = gameObject.GetComponent<Camera>();
-        confidence = gaussienne(80, 40);
         lampe = GameObject.Find("lampe");
     }
 
     System.Random rand = new System.Random(1);
-
-    public double gaussienne(float mean, float standardDeviation) {
-       
-        double u1 = 1.0 - rand.NextDouble(); //uniform(0,1] random doubles
-        double u2 = 1.0 - rand.NextDouble();
-        double randStdNormal = Math.Sqrt(-2.0 * Math.Log(u1)) *
-                     Math.Sin(2.0 * Math.PI * u2); //random normal(0,1)
-        double x =
-                     mean + standardDeviation * randStdNormal;
-
-        return x;
-    }
 
 
     bool RandomPoint(Vector3 center, float range, out Vector3 result)
@@ -155,25 +141,25 @@ public class AgentController : MonoBehaviour
                         float trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
                         //random => if random < trust, l'agent reçoit l'un des objets de l'autre
-                        float exchangeNumber = UnityEngine.Random.Range(0.0f, 1.0f);
+                        float exchangeNumber = UnityEngine.Random.Range(0.0f, 0.9f);
                         if (exchangeNumber < trust)
                         {
                             //récupérer l'inventaire de l'autre agent, sélectionner un objet au hasard
-                            clueNumber = random.Next(0, agentMetIndices.Count);
-                            GameObject objet = agentMetIndices[clueNumber];
+                            clueNumber = random.Next(0, objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices.Count);
+                            GameObject objet = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices[clueNumber];
 
                             // vérification de l'inventaire, si objet déjà présent -> on ne l'ajoute pas
                             if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objet))
                             {
-                                Debug.Log("Echange fait : " + objectinrange[i].name);
+                                Debug.Log("Echange fait : " + objet);
 
                                 agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objet);
                                 // temps au moment trouvaille
                                 temps_indice.Add(Time.deltaTime);
-                                inventory.Add(objectinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
+                                inventory.Add(objet); // plus facile pour la mémoire de garder aussi cet inventaire
 
                                 //pour l'inventaire
-                                allGameObjects.Append(objectinrange[i].name + "\n");
+                                allGameObjects.Append(objet.name + "\n");
                             }
                         }
                     }
@@ -274,7 +260,8 @@ public class AgentController : MonoBehaviour
             { memoire = "bonne"; }
             if (agent.gameObject.GetComponent<AgentCaracteristics>().courage==0.8f)
             { courage = "oui"; }
-            GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Nom : " + agent.gameObject.GetComponent<AgentCaracteristics>().noms + "\n Confiance aux autres : " + confiance + "% \n Mémoire : " + memoire + "\n Courageux : " + courage + "\n \n INDICES : \n \n" + allGameObjects  );
+            GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Confiance aux autres : " + confiance + "% \n Mémoire : " + memoire + "\n Courageux : " + courage + "\n \n INDICES : \n \n" + allGameObjects);
+
 
             if (GUI.Button(new Rect(930, 10, 30, 30), "X"))
             {

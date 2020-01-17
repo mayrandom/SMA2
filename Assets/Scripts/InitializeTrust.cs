@@ -22,7 +22,7 @@ public class InitializeTrust : MonoBehaviour
             x =
                         mean + standardDeviation * randStdNormal;
 
-            if (x < 100)
+            if (x < 100 && x>2)
                 tab[i] = x;
             else i--;
         }

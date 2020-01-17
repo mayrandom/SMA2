@@ -9954,7 +9954,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: 0
   m_Radius: 0.5000001
-  m_Speed: 1
+  m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -18484,6 +18484,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: f297797635a2b7445ad2ea55cec7353b, type: 2}
+    - target: {fileID: 1258019779867072, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
+      propertyPath: m_TagString
+      value: villagerF
+      objectReference: {fileID: 0}
     - target: {fileID: 4716740120580238, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
       propertyPath: m_LocalPosition.x
       value: -3.49
@@ -18495,10 +18499,6 @@ PrefabInstance:
     - target: {fileID: 4716740120580238, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
       propertyPath: m_LocalPosition.z
       value: -1.85
-      objectReference: {fileID: 0}
-    - target: {fileID: 1258019779867072, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
-      propertyPath: m_TagString
-      value: villagerF
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 95612694983450844, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
@@ -21499,6 +21499,10 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: f297797635a2b7445ad2ea55cec7353b, type: 2}
+    - target: {fileID: 1258019779867072, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
+      propertyPath: m_TagString
+      value: villagerFL
+      objectReference: {fileID: 0}
     - target: {fileID: 4716740120580238, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
       propertyPath: m_LocalPosition.x
       value: 8.11
@@ -21510,10 +21514,6 @@ PrefabInstance:
     - target: {fileID: 4716740120580238, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
       propertyPath: m_LocalPosition.z
       value: 2.55
-      objectReference: {fileID: 0}
-    - target: {fileID: 1258019779867072, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
-      propertyPath: m_TagString
-      value: villagerFL
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 95612694983450844, guid: 313ad0ef31f75b84f9f31c0528802fdd, type: 3}
