@@ -10,7 +10,7 @@ public class AgentController : MonoBehaviour
 {
     private NavMeshAgent agent;
     private NavMeshHit hit;
-    private float range = 10.0f;
+    private float range = 40.0f;
     private Vector3 point;
     public double confidence;
     public bool coupableTrouve = false;
@@ -232,6 +232,7 @@ public class AgentController : MonoBehaviour
     void OnMouseUp()
     {
         //Enable agent camera and button for returning to main view
+        agentCamera.cullingMask &= ~(1 << LayerMask.NameToLayer("Minimap"));
         agentCamera.enabled = true;
         returnButton.SetActive(true);
         returnButton.GetComponent<ReturnMainCamOnClick>().ReceiveAgent(gameObject);
