@@ -206,9 +206,11 @@ public class AgentController : MonoBehaviour
 
                     //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
                     float exchangeNumber = UnityEngine.Random.Range(0.0f, 1.0f);
-                    if (exchangeNumber < trust && trust == 0.8f)
+                    if (exchangeNumber < trust && trust >= 0.8f)
                     {
                         agent.gameObject.GetComponent<AgentCaracteristics>().indices.Clear();
+                        Debug.Log("Oublié ! " + agent.name);
+                        inventory.Clear();
                     }
                 }
             }
