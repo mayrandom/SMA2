@@ -25,12 +25,15 @@ public class AgentController : MonoBehaviour
     private Camera agentCamera;
     [SerializeField]
     public GameObject returnButton;
+    public GameObject lampe;
+
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         agentCamera = gameObject.GetComponent<Camera>();
         confidence = gaussienne(80, 40);
+        lampe = GameObject.Find("lampe");
     }
 
     System.Random rand = new System.Random(1);
@@ -187,12 +190,17 @@ public class AgentController : MonoBehaviour
             {
                 if (VillagerTagFL == objectinrange[i].tag)
                 {
-                    GameObject lampe = new GameObject();
-                    lampe.name = "lampe";
+
                     Debug.Log("Detected :" + objectinrange[i].name);
                     if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(lampe))
                     {
                         agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(lampe);
+                        // temps au moment trouvaille
+                        temps_indice.Add(Time.deltaTime);
+                        inventory.Add(lampe); // plus facile pour la mémoire de garder aussi cet inventaire
+
+                        //pour l'inventaire
+                        allGameObjects.Append(lampe.name + "\n");
                     }
                 }
                 if (VillagerTagF == objectinrange[i].tag)
