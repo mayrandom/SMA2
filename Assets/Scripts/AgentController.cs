@@ -146,7 +146,6 @@ public class AgentController : MonoBehaviour
             {
                 if (AgentTag == objectinrange[i].tag) //on vérifie que l'objet détecté est bien un agent
                 {
-                    Debug.Log("Detected : " + objectinrange[i].name);
 
                     if ((objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices != null) && (objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices.Count != 0)) //A VERIFIER
                     {
@@ -166,6 +165,8 @@ public class AgentController : MonoBehaviour
                             // vérification de l'inventaire, si objet déjà présent -> on ne l'ajoute pas
                             if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objet))
                             {
+                                Debug.Log("Echange fait : " + objectinrange[i].name);
+
                                 agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objet);
                                 // temps au moment trouvaille
                                 temps_indice.Add(Time.deltaTime);
