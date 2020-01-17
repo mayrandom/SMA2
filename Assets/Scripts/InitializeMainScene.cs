@@ -29,11 +29,11 @@ public class InitializeMainScene : MonoBehaviour
         noms = new string[] { "Jean", "Dominique", "Michel", "Marie", "Pascal" };
         GameObject Agent = GameObject.Find("Agent");
         trustValues = gameObject.GetComponent<InitializeTrust>().gaussienne(InitializeScene.nbTrust, 5.0);
-
+        GameObject currentAgent;
 
         for (int i = 1; i < 5; i++)
         {
-            Instantiate(Agent);
+            currentAgent = Instantiate(Agent);
 
             // Determine agent characteristics
             if (InitializeScene.nbMemory != 0)
@@ -52,9 +52,12 @@ public class InitializeMainScene : MonoBehaviour
             else
                 courage = false;
 
-            Agent.GetComponent<AgentCaracteristics>().ReceiveAgentParameters(memory, courage, (float) trustValues[i], i);
-            Agent.transform.position = initialPos[i - 1];
+            currentAgent.GetComponent<AgentCaracteristics>().ReceiveAgentParameters(memory, courage, (float) trustValues[i], i);
+            currentAgent.transform.position = initialPos[i - 1];
+            currentAgent.tag = "agent";
         }
+
+        Agent.SetActive(false);
     }
 
 }
