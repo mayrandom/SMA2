@@ -9,7 +9,7 @@ using System;
 public class AgentController : MonoBehaviour
 {
     public static System.Random random = new System.Random();
-    public static bool culpritFound = false;
+    public bool culpritFound = false;
     public List<GameObject> inventory = new List<GameObject>();
     public List<float> clueTimes = new List<float>();
 

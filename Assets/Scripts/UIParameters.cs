@@ -11,6 +11,8 @@ public class UIParameters : MonoBehaviour
     private float minutes;
     private float seconds;
     private float timeNow;
+    private GameObject[] agents;
+    public static int nbCulprit;
 
     // Start is called before the first frame update
     void Start()
@@ -35,6 +37,15 @@ public class UIParameters : MonoBehaviour
         timeText.GetComponent<Text>().text = "Temps écoulé \n" + minutes + " : " + seconds;
 
         if (minutes >= 5)
+        {
+            agents = GameObject.FindGameObjectsWithTag("agent");
+            for (int i = 0; i < agents.Length; i++)
+            {
+                if (agents[i].GetComponent<AgentController>().culpritFound)
+                    nbCulprit++;
+            }
             SceneManager.LoadScene("EndScene");
+        }
+            
     }
 }

@@ -16,6 +16,8 @@ public class InitializeScene : MonoBehaviour
     public static float nbMemory;
     public static float nbTrust;
     public static float nbCourage;
+    public static float startNbMemory;
+    public static float startNbCourage;
     private string trust;
 
     public void Initialize()
@@ -28,6 +30,8 @@ public class InitializeScene : MonoBehaviour
         if (nbTrust < 0)
             nbTrust = 0;
         nbCourage = SliderCourage.GetComponent<Slider>().value;
+        startNbMemory = nbMemory;
+        startNbCourage = nbCourage;
 
         SceneManager.LoadScene("MainScene");
     }
