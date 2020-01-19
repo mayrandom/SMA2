@@ -9,6 +9,7 @@ TagManager:
   - villagerL
   - villagerFL
   - agent
+  - forest
   layers:
   - Default
   - TransparentFX
