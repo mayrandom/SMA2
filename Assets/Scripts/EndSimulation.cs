@@ -24,7 +24,8 @@ public class EndSimulation : MonoBehaviour
         agents = GameObject.FindGameObjectsWithTag("agent");
         for(int i = 0; i < agents.Length; i++)
         {
-            // voir les agents qui ont trouvé le coupable
+            if (AgentController.culpritFound)
+                nbCulprit++;
         }
 
         nbAgentCulprit.GetComponent<TextMeshProUGUI>().text = "Nombre d'agents ayant trouvé le coupable : " + nbCulprit;

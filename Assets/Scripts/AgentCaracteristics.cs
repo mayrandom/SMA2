@@ -8,8 +8,7 @@ public class AgentCaracteristics : MonoBehaviour
     public float memory;
     public float courage;
     public float trust;
-    public List<GameObject> indices = new List<GameObject>();
-    public string[] noms;
+    public List<GameObject> clues = new List<GameObject>();
     public int id = 0;
 
 

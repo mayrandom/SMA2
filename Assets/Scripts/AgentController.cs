@@ -8,24 +8,25 @@ using System;
 
 public class AgentController : MonoBehaviour
 {
+    public static System.Random random = new System.Random();
+    public static bool culpritFound = false;
+    public List<GameObject> inventory = new List<GameObject>();
+    public List<float> clueTimes = new List<float>();
+
     private NavMeshAgent agent;
     private NavMeshHit hit;
     private float range = 40.0f;
-    private Vector3 point;
-    public bool coupableTrouve = false;
-    public int exchangeNumber;
-    public int clueNumber;
-    public GameObject clue;
-    public static System.Random random = new System.Random();
-    public List<GameObject> inventory = new List<GameObject>();
-    StringBuilder allGameObjects = new StringBuilder();
-    private List<float> temps_indice = new List<float>();
-    public Vector3 forest = new Vector3(-51f, 3f, 15f);
+    private Vector3 point;    
+    private int exchangeNumber;
+    private int clueNumber;
+    private GameObject clue; 
+    private StringBuilder allGameObjects = new StringBuilder();
+    private Vector3 forest = new Vector3(-51f, 3f, 15f);
     private Camera agentCamera;
+    private GameObject lampe;
+
     [SerializeField]
     public GameObject returnButton;
-    public GameObject lampe;
-
 
     void Start()
     {
@@ -57,7 +58,6 @@ public class AgentController : MonoBehaviour
     {
         if (RandomPoint(transform.position, range, out point))
         {
-            Debug.DrawRay(point, Vector3.up, Color.blue, 1.0f);
             agent.SetDestination(point);
             agent.transform.LookAt(point);
         }
@@ -76,7 +76,7 @@ public class AgentController : MonoBehaviour
                     SeeIndice(objectinrange);
                     SeeAgent(objectinrange);
                     SeeVillager(objectinrange);
-                    if (temps_indice.Count > 0)
+                    if (clueTimes.Count > 0)
                     {
                         VerifTime();
                     }
@@ -91,7 +91,10 @@ public class AgentController : MonoBehaviour
     public string VillagerTagF = "villagerF";  //edible tag
     public string VillagerTagL = "villagerL";  //edible tag
 
-
+    /// <summary>
+    /// Clue detection
+    /// </summary>
+    /// <param name="objectinrange"></param>
     void SeeIndice(Collider[] objectinrange)
     {
         if (objectinrange.Length > 0)
@@ -100,16 +103,15 @@ public class AgentController : MonoBehaviour
             {
                 if (IndiceTag == objectinrange[i].tag)
                 {
-                    Debug.Log("Detected :" + objectinrange[i].name);
-                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objectinrange[i].gameObject))
+                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().clues.Contains(objectinrange[i].gameObject))
                     {
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objectinrange[i].gameObject);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().clues.Add(objectinrange[i].gameObject);
                         
-                        // temps au moment trouvaille
-                        temps_indice.Add(Time.deltaTime);
+                        // discover time
+                        clueTimes.Add(Time.deltaTime);
                         inventory.Add(objectinrange[i].gameObject); // plus facile pour la mémoire de garder aussi cet inventaire
 
-                        //pour l'inventaire
+                        //inventory
                         allGameObjects.Append(objectinrange[i].name + "\n");
                     }
                 }
@@ -117,13 +119,22 @@ public class AgentController : MonoBehaviour
         }
     }
 
-    //get a list of colliders in range on this layer
+    /// <summary>
+    /// get a list of colliders in range on this layer
+    /// </summary>
+    /// <param name="agentPosition"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     Collider[] See(Vector3 agentPosition, float range)
     {
         Collider[] hitColliders = Physics.OverlapSphere(agentPosition, range);
         return hitColliders;
     }
 
+    /// <summary>
+    /// Agent detection
+    /// </summary>
+    /// <param name="objectinrange"></param>
     void SeeAgent(Collider[] objectinrange)
     {
         if (objectinrange.Length > 0)
@@ -133,32 +144,28 @@ public class AgentController : MonoBehaviour
                 if (AgentTag == objectinrange[i].tag) //on vérifie que l'objet détecté est bien un agent
                 {
 
-                    if ((objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices != null) && (objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices.Count != 0)) //A VERIFIER
+                    if ((objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().clues != null) && (objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().clues.Count != 0)) //A VERIFIER
                     {
-                        List<GameObject> agentMetIndices = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices;
-
-                        //récupérer trust de l'agent
+                        List<GameObject> agentMetclues = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().clues;
                         float trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
-                        //random => if random < trust, l'agent reçoit l'un des objets de l'autre
+                        // Get object from the encountered agent
                         float exchangeNumber = UnityEngine.Random.Range(0.0f, 0.9f);
                         if (exchangeNumber < trust)
                         {
-                            //récupérer l'inventaire de l'autre agent, sélectionner un objet au hasard
-                            clueNumber = random.Next(0, objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices.Count);
-                            GameObject objet = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().indices[clueNumber];
+                            // Get encountered agent inventory, and select random object to exchange
+                            clueNumber = random.Next(0, objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().clues.Count);
+                            GameObject objet = objectinrange[i].gameObject.GetComponent<AgentCaracteristics>().clues[clueNumber];
 
-                            // vérification de l'inventaire, si objet déjà présent -> on ne l'ajoute pas
-                            if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(objet))
+                            // Inventory check, if the object is already present, we don't add it to the inventory
+                            if (!agent.gameObject.GetComponent<AgentCaracteristics>().clues.Contains(objet))
                             {
-                                Debug.Log("Echange fait : " + objet);
+                                agent.gameObject.GetComponent<AgentCaracteristics>().clues.Add(objet);
+                                // Discovering time
+                                clueTimes.Add(Time.deltaTime);
+                                inventory.Add(objet);
 
-                                agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(objet);
-                                // temps au moment trouvaille
-                                temps_indice.Add(Time.deltaTime);
-                                inventory.Add(objet); // plus facile pour la mémoire de garder aussi cet inventaire
-
-                                //pour l'inventaire
+                                // Inventory
                                 allGameObjects.Append(objet.name + "\n");
                             }
                         }
@@ -169,6 +176,10 @@ public class AgentController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Villager detection and encounter 
+    /// </summary>
+    /// <param name="objectinrange"></param>
     void SeeVillager(Collider[] objectinrange)
     {
         if (objectinrange.Length > 0)
@@ -177,22 +188,20 @@ public class AgentController : MonoBehaviour
             {
                 if (VillagerTagFL == objectinrange[i].tag)
                 {
-
-                    Debug.Log("Detected :" + objectinrange[i].name);
-                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().indices.Contains(lampe))
+                    if (!agent.gameObject.GetComponent<AgentCaracteristics>().clues.Contains(lampe))
                     {
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Add(lampe);
-                        // temps au moment trouvaille
-                        temps_indice.Add(Time.deltaTime);
-                        inventory.Add(lampe); // plus facile pour la mémoire de garder aussi cet inventaire
+                        agent.gameObject.GetComponent<AgentCaracteristics>().clues.Add(lampe);
 
-                        //pour l'inventaire
+                        // dicovering time for memory
+                        clueTimes.Add(Time.deltaTime);
+                        inventory.Add(lampe); 
+
+                        //inventory
                         allGameObjects.Append(lampe.name + "\n");
                     }
                 }
                 if (VillagerTagF == objectinrange[i].tag)
                 {
-                    Debug.Log("Detected :" + objectinrange[i].name);
                     if (agent.gameObject.GetComponent<AgentCaracteristics>().courage == 0.8f)
                     {
                         agent.SetDestination(forest); //si courage, agent va dans la forêt
@@ -201,15 +210,13 @@ public class AgentController : MonoBehaviour
                 }
                 if (VillagerTagL == objectinrange[i].tag)
                 {
-                    Debug.Log("Detected :" + objectinrange[i].name);
                     float trust = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
 
-                    //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses indices
+                    //random => if random < trust et trust élevée, l'agent croit le villageois et oublie tous ses clues
                     float exchangeNumber = UnityEngine.Random.Range(0.0f, 1.0f);
                     if (exchangeNumber < trust && trust >= 0.8f)
                     {
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Clear();
-                        Debug.Log("Oublié ! " + agent.name);
+                        agent.gameObject.GetComponent<AgentCaracteristics>().clues.Clear();
                         inventory.Clear();
                     }
                 }
@@ -220,7 +227,7 @@ public class AgentController : MonoBehaviour
    
 
     /// <summary>
-    /// INVENTAIRE
+    /// INVENTORY
     /// </summary>
 
     //Private Variables
@@ -234,7 +241,7 @@ public class AgentController : MonoBehaviour
         returnButton.SetActive(true);
         returnButton.GetComponent<ReturnMainCamOnClick>().ReceiveAgent(gameObject);
 
-        //lorsqu on clic gauche sur l'objet contenant ce script,l'inventaire s'affiche et se ferme
+        // Inventory display when left clicking on the agent
         if (Input.GetMouseButtonUp(0))
         {
             if (InventoryOn == false)
@@ -255,14 +262,14 @@ public class AgentController : MonoBehaviour
             GUI.BeginGroup(new Rect(0, 0, 2000, 2000));
 
             Rect sizeBox = new Rect(930, 10, 200, 500);
-            string memoire = "mauvaise";
+            string memory = "mauvaise";
             string courage = "non";
             double confiance = agent.gameObject.GetComponent<AgentCaracteristics>().trust;
-            if (agent.gameObject.GetComponent<AgentCaracteristics>().memory==0.8f)
-            { memoire = "bonne"; }
-            if (agent.gameObject.GetComponent<AgentCaracteristics>().courage==0.8f)
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().memory == 0.8f)
+            { memory = "bonne"; }
+            if (agent.gameObject.GetComponent<AgentCaracteristics>().courage == 0.8f)
             { courage = "oui"; }
-            GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Confiance aux autres : " + confiance + "% \n Mémoire : " + memoire + "\n Courageux : " + courage + "\n \n INDICES : \n \n" + allGameObjects);
+            GUI.Box(sizeBox, "\n \n CARACTERISTIQUES : \n \n Confiance aux autres : " + confiance + "% \n Mémoire : " + memory + "\n Courageux : " + courage + "\n \n clues : \n \n" + allGameObjects);
 
 
             if (GUI.Button(new Rect(930, 10, 30, 30), "X"))
@@ -275,21 +282,21 @@ public class AgentController : MonoBehaviour
     }
 
     /// <summary>
-    /// COUPABLE DESIGNE
+    /// Found Culprit
     /// </summary>
 
-    public bool Coupable()
+    public void Culprit()
     {
-        string[] indices = { "couteau", "champignons", "compas", "briquet", "carnet", "lampe" };
+        string[] clues = { "couteau", "champignons", "compas", "briquet", "carnet", "lampe" };
         int[] points = { 6, 5, 4, 3, 2, 1 };
         int total = 0;
 
 
         for (int i = 0; i < inventory.Count; i++)
         {
-            for (int j = 0; j < indices.Length; j++)
+            for (int j = 0; j < clues.Length; j++)
             {
-                if (inventory[i].name == indices[j])
+                if (inventory[i].name == clues[j])
                 {
                     total = total + points[j];
                 }
@@ -298,69 +305,96 @@ public class AgentController : MonoBehaviour
         }
 
         if (total >= 10)
-            return true;
-        else return false;
+        {
+            culpritFound = true;
+        }
+            
+        else culpritFound = false;
     }
 
 
     /// <summary>
-    /// MEMOIRE
+    /// MEMORY
     /// </summary>
     /// 
 
 
     private float timer = 0.0f;
-    private List<string> anciens_indices=new List<string>();
+    private List<string> oldClues = new List<string>();
 
-    void VerifTime() // il faudrait le faire pour deux niveaux différents (là on suppose que c'est pour la bonne mémoire)
+    void VerifTime()
     {
-        timer += Time.deltaTime;
+        float timer = Time.timeSinceLevelLoad;
         int k = 0;
-        
-        
-        for (int i = 0; i < temps_indice.Count; i++)
+
+        for (int i = 0; i < clueTimes.Count; i++) // list update in SeeIndice or SeeAgent
         {
-
-            for (int j = 0; j < anciens_indices.Count; j++)
+            for (int j = 0; j < oldClues.Count; j++)
             {
-                Debug.Log("verification temps");
-                if (inventory[i].name == anciens_indices[j])
-                {
-                    k++; //compte le nombre de rappels  
-                }
 
-                if (k == 0) //il a eu l'indice qu'une seule fois
+                if (agent.gameObject.GetComponent<AgentCaracteristics>().memory == 0.8f) //Good memory
                 {
-                    if (timer - temps_indice[i] > 100.0f) // bon là j'ai mit un temps au hasard, à redéfinir
+                    if (k == 0) // has got the clue only one time
                     {
-                       inventory.Remove(inventory[i]);
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i]);
-                        temps_indice.Remove(temps_indice[i]);
-                        anciens_indices.Add(inventory[i].name);
+                        if (timer - clueTimes[i] > 10.0f) 
+                        {
+                            oldClues.Add(inventory[i].name);
+                            inventory.Remove(inventory[i]);
+                            agent.gameObject.GetComponent<AgentCaracteristics>().clues.Remove(agent.gameObject.GetComponent<AgentCaracteristics>().clues[i]);
+                            clueTimes.Remove(clueTimes[i]);
 
+
+                        }
+                    }
+                    else
+                    {
+                        if (inventory[i].name == oldClues[j])
+                        {
+                            k++; //number of reminders
+                        }
+
+                        if (timer - clueTimes[i] > 150.0f) // longer memory if has got reminders
+                        {
+                            oldClues.Add(inventory[i].name);
+                            inventory.Remove(inventory[i]);
+                            agent.gameObject.GetComponent<AgentCaracteristics>().clues.Remove(agent.gameObject.GetComponent<AgentCaracteristics>().clues[i]);
+                            clueTimes.Remove(clueTimes[i]);
+
+
+                        }
                     }
                 }
-                else
-                {
-                    if (timer - temps_indice[i] > 200.0f) // s'en souvient plus longtemps s'il y a eu un rappel
-                    {
-                        inventory.Remove(inventory[i]);
-                        agent.gameObject.GetComponent<AgentCaracteristics>().indices.Remove(inventory[i]);
-                        temps_indice.Remove(temps_indice[i]);
-                        anciens_indices.Add(inventory[i].name);
 
+                if (agent.gameObject.GetComponent<AgentCaracteristics>().memory == 0.2f) //Bad memory
+                {
+                    if (k == 0) //got clue only one time
+                    {
+                        Debug.Log(i);
+                        if (timer - clueTimes[i] > 10.0f) 
+                        {
+                            oldClues.Add(inventory[i].name);
+                            inventory.Remove(inventory[i]);
+                            agent.gameObject.GetComponent<AgentCaracteristics>().clues.Remove(agent.gameObject.GetComponent<AgentCaracteristics>().clues[i]);
+                            clueTimes.Remove(clueTimes[i]);
+
+                        }
+                    }
+                    else
+                    {
+                        if (timer - clueTimes[i] > 100.0f) // memory longer if there was a reminder
+                        {
+                            oldClues.Add(inventory[i].name);
+                            inventory.Remove(inventory[i]);
+                            agent.gameObject.GetComponent<AgentCaracteristics>().clues.Remove(agent.gameObject.GetComponent<AgentCaracteristics>().clues[i]);
+                            clueTimes.Remove(clueTimes[i]);
+
+                        }
                     }
                 }
 
                 k = 0;
             }
-
-
-
         }
-
-
     }
-
 }
 
