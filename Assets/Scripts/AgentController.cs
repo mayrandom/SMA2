@@ -24,6 +24,8 @@ public class AgentController : MonoBehaviour
     private Vector3 forest = new Vector3(-51f, 3f, 15f);
     private Camera agentCamera;
     private GameObject lampe;
+    [SerializeField]
+    private Animation anim;
 
     [SerializeField]
     public GameObject returnButton;
@@ -68,10 +70,12 @@ public class AgentController : MonoBehaviour
     {
         if (!agent.pathPending)
         {
+            anim.Play("m_run");
             if (agent.remainingDistance <= agent.stoppingDistance) // si l'agent est immobile
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     FreeWalk();
+                    
                     Collider[] objectinrange = See(transform.position, seeRange);
                     SeeIndice(objectinrange);
                     SeeAgent(objectinrange);

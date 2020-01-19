@@ -24,14 +24,14 @@ public class InitializeMainScene : MonoBehaviour
         Vector3 pos2 = new Vector3(13.49f, 7.1f, 8.46f);
         Vector3 pos3 = new Vector3(14.37f, 5.14f, -15.49f);
         Vector3 pos4 = new Vector3(-6.6f, 6.7f, 14f);
-        Vector3[] initialPos = new Vector3[] { pos1, pos2, pos3, pos4 };
+        Vector3 pos5 = new Vector3(-58.1f, 8.6f, -3.9f);
+        Vector3[] initialPos = new Vector3[] { pos1, pos2, pos3, pos4, pos5 };
 
-        noms = new string[] { "Jean", "Dominique", "Michel", "Marie", "Pascal" };
         GameObject Agent = GameObject.Find("Agent");
         trustValues = gameObject.GetComponent<InitializeTrust>().gaussienne(InitializeScene.nbTrust, 5.0);
         GameObject currentAgent;
 
-        for (int i = 1; i < 5; i++)
+        for (int i = 0; i < 5; i++)
         {
             currentAgent = Instantiate(Agent);
 
@@ -53,7 +53,7 @@ public class InitializeMainScene : MonoBehaviour
                 courage = false;
 
             currentAgent.GetComponent<AgentCaracteristics>().ReceiveAgentParameters(memory, courage, (float) trustValues[i], i);
-            currentAgent.transform.position = initialPos[i - 1];
+            currentAgent.transform.position = initialPos[i];
             currentAgent.tag = "agent";
         }
 
