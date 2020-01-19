@@ -24,9 +24,11 @@ public class AgentController : MonoBehaviour
     private Vector3 forest = new Vector3(-51f, 3f, 15f);
     private Camera agentCamera;
     private GameObject lampe;
+    public bool outForest = false;
+    Vector3 direction = new Vector3(1, 0, 0);
+
     [SerializeField]
     private Animation anim;
-
     [SerializeField]
     public GameObject returnButton;
 
@@ -56,8 +58,25 @@ public class AgentController : MonoBehaviour
         return false;
     }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "forest" && gameObject.GetComponent<AgentCaracteristics>().courage == 0.2f)
+            outForest = true;
+        else
+            outForest = false;
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.tag == "forest")
+            outForest = false;
+    }
+
+
     void FreeWalk()
     {
+        if (outForest)
+            transform.Translate(direction * Time.deltaTime);
         if (RandomPoint(transform.position, range, out point))
         {
             agent.SetDestination(point);
@@ -71,11 +90,11 @@ public class AgentController : MonoBehaviour
         if (!agent.pathPending)
         {
             anim.Play("m_run");
-            if (agent.remainingDistance <= agent.stoppingDistance) // si l'agent est immobile
+            
+            if (agent.remainingDistance <= agent.stoppingDistance) // if agent doesn't move
                 if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
                 {
                     FreeWalk();
-                    
                     Collider[] objectinrange = See(transform.position, seeRange);
                     SeeIndice(objectinrange);
                     SeeAgent(objectinrange);
