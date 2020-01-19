@@ -110,11 +110,11 @@ public class AgentController : MonoBehaviour
     }
 
     public float seeRange = 4.0f;             //range to detect items
-    public string IndiceTag = "indice";  //edible tag
-    public string AgentTag = "agent";  //edible tag
-    public string VillagerTagFL = "villagerFL";  //edible tag
-    public string VillagerTagF = "villagerF";  //edible tag
-    public string VillagerTagL = "villagerL";  //edible tag
+    private string IndiceTag = "indice";  //edible tag
+    private string AgentTag = "agent";  //edible tag
+    private string VillagerTagFL = "villagerFL";  //edible tag
+    private string VillagerTagF = "villagerF";  //edible tag
+    private string VillagerTagL = "villagerL";  //edible tag
 
     /// <summary>
     /// Clue detection
@@ -361,7 +361,7 @@ public class AgentController : MonoBehaviour
                 {
                     if (k == 0) // has got the clue only one time
                     {
-                        if (timer - clueTimes[i] > 10.0f) 
+                        if (timer - clueTimes[i] > 50.0f) 
                         {
                             oldClues.Add(inventory[i].name);
                             inventory.Remove(inventory[i]);
