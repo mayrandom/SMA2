@@ -105,6 +105,8 @@ public class AgentController : MonoBehaviour
                     }
                 }
         }
+
+        Culprit();
     }
 
     public float seeRange = 4.0f;             //range to detect items
